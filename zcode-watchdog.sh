@@ -282,14 +282,14 @@ check_network() {
   done <<< "$conns"
 }
 
-# ----------------------------- 信号 3：暂存大文件 ----------------------------
+# 排除说明：cli/db/ 是 CLI 的本地会话数据库（WAL sqlite，曾致 00:04 误报）
 check_staging() {
   local -a targets
   targets=( "$HOME_DIR/.zcode" "$APP_SUPPORT_ZCODE" )
   [[ -n "$USER_TMPDIR" && -d "$USER_TMPDIR" ]] && targets+=( "$USER_TMPDIR" )
   local hits
   hits=$(/usr/bin/find "${targets[@]}" -type f -size +${STAGING_MIN_BYTES}c -mmin -${STAGING_WINDOW_MIN} 2>/dev/null \
-    | grep -v -E '(logs/|cli/log/|cli/rollout/|cli/artifacts/|cli/exec/|Cache_Data|GPUCache|Code Cache|DawnWebGPUCache|DawnGraphiteCache|Session Storage|Local Storage|IndexedDB|@zcodedesktop-updater|/Shared Dictionary|crash/)' \
+    | grep -v -E '(logs/|cli/log/|cli/rollout/|cli/artifacts/|cli/exec/|cli/db/|Cache_Data|GPUCache|Code Cache|DawnWebGPUCache|DawnGraphiteCache|Session Storage|Local Storage|IndexedDB|@zcodedesktop-updater|/Shared Dictionary|crash/)' \
     | head -20)
   if [[ -n "$hits" ]]; then
     local f sz detail=""
